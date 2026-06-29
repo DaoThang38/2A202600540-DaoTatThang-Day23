@@ -26,6 +26,12 @@ checkpoints.db
 checkpoints.db-wal
 checkpoints.db-shm
 
+# Outputs
+outputs/*.json
+
+# Tools
+.deepeval/
+
 # Testing
 .pytest_cache/
 .ruff_cache/
