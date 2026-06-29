@@ -41,10 +41,10 @@ def classify_node(state: AgentState) -> dict:
     structured_llm = llm.with_structured_output(IntentClassification)
     prompt = f"""Classify the user's support-ticket query into one of the following routes:
 - risky: Actions with side effects like refunds, deletions, sending emails, cancellations.
-- tool: Information lookups like order status, tracking, search queries.
-- missing_info: Vague/incomplete queries lacking actionable context.
+- tool: Information lookups like order status, tracking, search queries, company policies (SLA, HR, VPN, refunds, admin access, FAQ, account lockout/login limits). Note: if asking about general company rules or limits, route to tool, not missing_info.
+- missing_info: Vague/incomplete queries lacking actionable context (do NOT use this for general policy questions).
 - error: System failures like timeouts, crashes, service unavailable.
-- simple: General questions answerable without tools or actions.
+- simple: General questions answerable without tools, actions, or specific policies.
 
 Priority: risky > tool > missing_info > error > simple.
 
@@ -64,11 +64,36 @@ Query: {query}"""
 def tool_node(state: AgentState) -> dict:
     attempt = state.get("attempt", 0)
     route = state.get("route", "")
+    query = state.get("query", "").lower()
     
     if route == Route.ERROR and attempt < 2:
         result_string = "ERROR: Timeout failure while processing request."
     else:
-        result_string = "SUCCESS: Tool executed successfully."
+        # Mock RAG retrieval
+        knowledge_base = {
+            "policy_refund_v4": "Chính sách hoàn tiền: Khách hàng có tối đa 7 ngày làm việc để gửi yêu cầu hoàn tiền sau khi đơn được xác nhận. Các loại sản phẩm bị loại khỏi điều kiện hoàn tiền bao gồm: hàng kỹ thuật số, license key, subscription. Finance Team xử lý yêu cầu hoàn tiền trong 3-5 ngày làm việc.",
+            "sla_p1_2026": "SLA P1 2026: SLA phản hồi ban đầu cho ticket P1 là 15 phút. SLA resolution cho ticket P1 là 4 giờ. Nếu không có phản hồi với ticket P1 sau 10 phút thì hệ thống auto escalate.",
+            "it_helpdesk_faq": "Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp. VPN cho phép kết nối tối đa 2 thiết bị cùng lúc.",
+            "hr_leave_policy": "Chính sách HR 2026: Nhân viên dưới 3 năm kinh nghiệm được 12 ngày phép năm. Không áp dụng 10 ngày phép năm của bản HR 2025.",
+            "access_control_sop": "Level 4 Admin Access yêu cầu phê duyệt bởi IT Manager hoặc CISO."
+        }
+        
+        retrieved_docs = []
+        if "hoàn tiền" in query or "refund" in query:
+            retrieved_docs.append(knowledge_base["policy_refund_v4"])
+        if "sla" in query or "p1" in query or "phản hồi" in query or "escalate" in query:
+            retrieved_docs.append(knowledge_base["sla_p1_2026"])
+        if "tài khoản" in query or "đăng nhập" in query or "vpn" in query or "thiết bị" in query:
+            retrieved_docs.append(knowledge_base["it_helpdesk_faq"])
+        if "nhân viên" in query or "kinh nghiệm" in query or "phép" in query or "hr" in query:
+            retrieved_docs.append(knowledge_base["hr_leave_policy"])
+        if "level 4" in query or "admin" in query or "phê duyệt" in query:
+            retrieved_docs.append(knowledge_base["access_control_sop"])
+            
+        if retrieved_docs:
+            result_string = "SUCCESS: Retrieved documents:\n" + "\n".join(retrieved_docs)
+        else:
+            result_string = "SUCCESS: Tool executed successfully."
         
     return {
         "tool_results": [result_string],

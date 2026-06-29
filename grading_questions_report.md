@@ -4,15 +4,15 @@
 
 | ID | Phân Loại (Route) | Trạng thái (Pass/Fail) | Trích xuất câu trả lời |
 |---|---|---|---|
-| gq_d10_01 | `tool` | ❌ Fail | Theo chính sách hoàn tiền hiện hành, khách hàng có tối đa 30 ngày làm việc để gửi yêu cầu hoàn tiền sau khi đơn được xác... |
-| gq_d10_02 | `simple` | ❌ Fail | Các loại sản phẩm thường bị loại khỏi điều kiện hoàn tiền bao gồm: sản phẩm đã qua sử dụng, sản phẩm bị hư hỏng, sản phẩ... |
-| gq_d10_03 | `tool` | ❌ Fail | Thời gian xử lý yêu cầu hoàn tiền của đội ngũ tài chính thường phụ thuộc vào quy trình nội bộ của công ty. Thông thường,... |
-| gq_d10_04 | `simple` | ❌ Fail | SLA phản hồi ban đầu cho ticket P1 thường là 1 giờ. Tuy nhiên, thời gian cụ thể có thể thay đổi tùy thuộc vào chính sách... |
-| gq_d10_05 | `simple` | ✅ Pass | SLA resolution cho ticket P1 thường là 1 giờ hoặc 4 giờ, tùy thuộc vào chính sách của từng tổ chức. Bạn nên kiểm tra quy... |
-| gq_d10_06 | `missing_info` | ❌ Fail | Bạn có thể cho biết hệ thống mà bạn đang đề cập đến là gì không?... |
-| gq_d10_07 | `simple` | ✅ Pass | Tài khoản thường bị khóa sau 3 đến 5 lần đăng nhập sai liên tiếp, tùy thuộc vào chính sách bảo mật của từng dịch vụ. Bạn... |
-| gq_d10_08 | `simple` | ❌ Fail | Số lượng thiết bị mà một VPN cho phép kết nối cùng lúc phụ thuộc vào nhà cung cấp dịch vụ VPN cụ thể. Một số VPN cho phé... |
-| gq_d10_09 | `simple` | ✅ Pass | Theo chính sách HR 2026, nhân viên có dưới 3 năm kinh nghiệm sẽ được hưởng 12 ngày phép năm.... |
-| gq_d10_10 | `missing_info` | ❌ Fail | Bạn có thể cho biết rõ hơn về hệ thống hoặc tổ chức mà bạn đang đề cập đến không?... |
+| gq_d10_01 | `tool` | ✅ Pass | Khách hàng có tối đa 7 ngày làm việc để gửi yêu cầu hoàn tiền sau khi đơn được xác nhận.... |
+| gq_d10_02 | `tool` | ✅ Pass | Các loại sản phẩm bị loại khỏi điều kiện hoàn tiền bao gồm: hàng kỹ thuật số, license key, subscription.... |
+| gq_d10_03 | `tool` | ✅ Pass | Finance Team xử lý yêu cầu hoàn tiền trong 3-5 ngày làm việc.... |
+| gq_d10_04 | `tool` | ✅ Pass | SLA phản hồi ban đầu cho ticket P1 là 15 phút.... |
+| gq_d10_05 | `tool` | ✅ Pass | SLA resolution cho ticket P1 là 4 giờ.... |
+| gq_d10_06 | `tool` | ✅ Pass | Nếu không có phản hồi với ticket P1 sau 10 phút thì hệ thống sẽ tự động escalate.... |
+| gq_d10_07 | `tool` | ✅ Pass | Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp.... |
+| gq_d10_08 | `tool` | ✅ Pass | VPN cho phép kết nối tối đa 2 thiết bị cùng lúc.... |
+| gq_d10_09 | `tool` | ✅ Pass | Nhân viên dưới 3 năm kinh nghiệm được 12 ngày phép năm theo chính sách HR 2026.... |
+| gq_d10_10 | `tool` | ✅ Pass | Level 4 Admin Access yêu cầu phê duyệt bởi IT Manager hoặc CISO.... |
 
-**Tỷ lệ pass tiêu chí answer:** 3/10
+**Tỷ lệ pass tiêu chí answer:** 10/10
