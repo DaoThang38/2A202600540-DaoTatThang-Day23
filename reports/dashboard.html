@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Lab Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f0f2f5; }
+        header { background-color: #2c3e50; color: white; padding: 20px; text-align: center; }
+        .container { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); flex: 1; min-width: 400px; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+        .mermaid { display: flex; justify-content: center; }
+        pre { background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto; border: 1px solid #e9ecef; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; font-weight: 600; }
+        .trace-step { border-left: 4px solid #3498db; padding-left: 15px; margin-bottom: 20px; }
+        .trace-node { font-weight: bold; color: #3498db; font-size: 1.1em; }
+        .trace-state { font-family: monospace; background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top: 5px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>LangGraph Agentic Orchestration - Dashboard</h1>
+    </header>
+    <div class="container">
+        
+        <!-- Left Column: Report & Trace -->
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+            <div class="card" id="report-card">
+                <h2>Evaluation Report</h2>
+                <div id="report-content"></div>
+            </div>
+            
+            <div class="card">
+                <h2>Execution Trace Demo</h2>
+                <p><strong>Simulated Query:</strong> "Please refund my order 999 immediately!"</p>
+                <div id="trace-content"></div>
+            </div>
+        </div>
+
+        <!-- Right Column: Architecture -->
+        <div class="card" style="flex: 1.5;">
+            <h2>Architecture Diagram</h2>
+            <div class="mermaid">
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	intake(intake)
+	classify(classify)
+	tool(tool)
+	evaluate(evaluate)
+	answer(answer)
+	clarify(clarify)
+	risky_action(risky_action)
+	approval(approval)
+	retry(retry)
+	dead_letter(dead_letter)
+	finalize(finalize)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> intake;
+	answer --> finalize;
+	approval -.-> clarify;
+	approval -.-> tool;
+	clarify --> finalize;
+	classify -.-> answer;
+	classify -.-> clarify;
+	classify -.-> retry;
+	classify -.-> risky_action;
+	classify -.-> tool;
+	dead_letter --> finalize;
+	evaluate -.-> answer;
+	evaluate -.-> retry;
+	intake --> classify;
+	retry -.-> dead_letter;
+	retry -.-> tool;
+	risky_action --> approval;
+	tool --> evaluate;
+	finalize --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        // Render Markdown
+        const markdownContent = "# Day 08 Lab Report\n\n## 1. Metrics Summary\n\n- **Total Scenarios**: 7\n- **Success Rate**: 100.00%\n- **Average Nodes Visited**: 6.4\n- **Total Retries**: 0\n- **Total Interrupts**: 0\n\n## 2. Per-scenario Results\n\n| Scenario | Expected Route | Actual Route | Success | Retries | Interrupts |\n|---|---|---|---:|---:|---:|\n| S01_simple | simple | simple | Yes | 0 | 0 |\n| S02_tool | tool | tool | Yes | 0 | 0 |\n| S03_missing | missing_info | missing_info | Yes | 0 | 0 |\n| S04_risky | risky | risky | Yes | 0 | 0 |\n| S05_error | error | error | Yes | 0 | 0 |\n| S06_delete | risky | risky | Yes | 0 | 0 |\n| S07_dead_letter | error | error | Yes | 0 | 0 |\n\n## 3. Architecture & State Schema\n\nThe LangGraph workflow consists of conditional routing from the classification step into specialized nodes. A retry loop is built via `route_after_evaluate`, and `route_after_approval` forms the HITL pattern.\nAdditional state fields added:\n- `evaluation_result`: Controls retry logic loop.\n- `pending_question`: Tracks info needed from user.\n- `proposed_action`: For the HITL review step.\n- `approval`: Contains reviewer decision.\n\n## 4. Failure Analysis\n\n- **Tool Retry Exhaustion**: Simulated in scenario 7, triggering the `dead_letter` route.\n- **Invalid classifications**: Evaluated directly through LLM structured outputs to enforce enums.\n\n## 5. Improvement Plan\n\n- Add parallel execution for multiple tool scenarios.\n- Connect to a real database checkpointer for crash recovery.\n";
+        document.getElementById('report-content').innerHTML = marked.parse(markdownContent);
+        
+        // Render Trace
+        const traceSteps = [{"node": "intake", "state": {"query": "Please refund my order 999 immediately!", "messages": "[str] intake:Please refund my order 999 immediately!...", "events": "[{'node': 'intake', 'event_type': 'completed', 'message': 'query normalized', 'latency_ms': 0, 'metadata': {}}]"}}, {"node": "API_ERROR_FALLBACK", "state": {"error": "Connection error.", "note": "Showing a mocked trace due to network error."}}, {"node": "intake", "state": {"query": "Please refund my order 999 immediately!"}}, {"node": "classify", "state": {"classification": "risky"}}, {"node": "risky_action", "state": {"proposed_action": "refund user"}}, {"node": "approval", "state": {"approval": "approved"}}, {"node": "tool", "state": {"tool_output": "Refund processed."}}, {"node": "finalize", "state": {"status": "done"}}];
+        const traceContainer = document.getElementById('trace-content');
+        traceSteps.forEach((step, index) => {
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'trace-step';
+            stepDiv.innerHTML = `
+                <div class="trace-node">Step ${index + 1}: Node [${step.node}]</div>
+                <div class="trace-state">${JSON.stringify(step.state, null, 2)}</div>
+            `;
+            traceContainer.appendChild(stepDiv);
+        });
+    </script>
+</body>
+</html>
